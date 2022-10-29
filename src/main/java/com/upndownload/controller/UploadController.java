@@ -2,6 +2,7 @@ package com.upndownload.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -13,12 +14,13 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 @Controller
 public class UploadController {
 
     //Save the uploaded file to this folder
-    private static String UPLOADED_FOLDER = "D://temp//";
+    private static String UPLOADED_FOLDER = "D:/temp/";
 
     @GetMapping("/")
     public String index() {
@@ -34,19 +36,24 @@ public class UploadController {
             return "redirect:uploadStatus";
         }
 
+        /*
+                    // Get the file and save it somewhere    -- Throwing Java Heap Space memory issue
+                    byte[] bytes = file.getBytes();
+                    Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
+                    Files.write(path, bytes);*/
+        String fileBasepath = "D:/Temp/";
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        Path path = Paths.get(fileBasepath + fileName);
+
         try {
-
-            // Get the file and save it somewhere
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
-            Files.write(path, bytes);
-
-            redirectAttributes.addFlashAttribute("message",
-                    "You successfully uploaded '" + file.getOriginalFilename() + "'");
-
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
+        redirectAttributes.addFlashAttribute("message",
+                "You successfully uploaded '" + file.getOriginalFilename() + "'");
 
         return "redirect:/uploadStatus";
     }
