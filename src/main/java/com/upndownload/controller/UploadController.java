@@ -41,9 +41,8 @@ public class UploadController {
                     byte[] bytes = file.getBytes();
                     Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
                     Files.write(path, bytes);*/
-        String fileBasepath = "D:/Temp/";
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        Path path = Paths.get(fileBasepath + fileName);
+        Path path = Paths.get(UPLOADED_FOLDER + fileName);
 
         try {
             Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
